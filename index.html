@@ -888,84 +888,127 @@ const Music = (() => {
     [220.00, 261.63, 329.63],  // A min
   ];
 
-  // ── Kick: sub thump + transient click for punch ──
+  // ── ROCK KICK: 3 layers — deep sub + mid punch + beater click ──
   function kick(t, vol = 1) {
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.frequency.setValueAtTime(110, t);
-    o.frequency.exponentialRampToValueAtTime(45, t + 0.07);
-    o.frequency.exponentialRampToValueAtTime(0.001, t + 0.42);
-    g.gain.setValueAtTime(vol * 2.0, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.43);
-    // Transient click
-    const oc = ctx.createOscillator(), gc = ctx.createGain();
-    oc.frequency.setValueAtTime(200, t);
-    oc.frequency.exponentialRampToValueAtTime(60, t + 0.025);
-    gc.gain.setValueAtTime(vol * 2.2, t);
-    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
-    oc.connect(gc); gc.connect(master); oc.start(t); oc.stop(t + 0.03);
+    // Layer 1: sub thump (80→40 Hz, 0.9s) — the chest-hitting low end
+    const sub = ctx.createOscillator(), subG = ctx.createGain();
+    sub.frequency.setValueAtTime(82, t);
+    sub.frequency.exponentialRampToValueAtTime(42, t + 0.18);
+    sub.frequency.exponentialRampToValueAtTime(0.001, t + 0.9);
+    subG.gain.setValueAtTime(vol * 2.8, t);
+    subG.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+    sub.connect(subG); subG.connect(master); sub.start(t); sub.stop(t + 0.91);
+
+    // Layer 2: mid punch (160→65 Hz, 0.18s) — the body
+    const mid = ctx.createOscillator(), midG = ctx.createGain();
+    mid.frequency.setValueAtTime(160, t);
+    mid.frequency.exponentialRampToValueAtTime(65, t + 0.18);
+    midG.gain.setValueAtTime(vol * 2.2, t);
+    midG.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    mid.connect(midG); midG.connect(master); mid.start(t); mid.stop(t + 0.23);
+
+    // Layer 3: beater click (260→90 Hz, 0.025s) — the attack transient
+    const click = ctx.createOscillator(), clickG = ctx.createGain();
+    click.frequency.setValueAtTime(260, t);
+    click.frequency.exponentialRampToValueAtTime(90, t + 0.025);
+    clickG.gain.setValueAtTime(vol * 2.4, t);
+    clickG.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+    click.connect(clickG); clickG.connect(master); click.start(t); click.stop(t + 0.03);
   }
 
-  // ── Snare: noise body + crack transient ──
+  // ── ROCK SNARE: wide noise body + shell resonance + crack ──
   function snare(t, vol = 1) {
-    const len = Math.floor(ctx.sampleRate * 0.18);
+    // Noise body with shaped envelope (louder, longer than electronic)
+    const len = Math.floor(ctx.sampleRate * 0.32);
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    for (let i = 0; i < len; i++) {
+      const env = Math.pow(1 - i / len, 1.4);
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
     const src = ctx.createBufferSource(); src.buffer = buf;
     const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass'; hp.frequency.value = 1000;
+    hp.type = 'highpass'; hp.frequency.value = 600;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(vol * 1.1, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    g.gain.setValueAtTime(vol * 1.6, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
     src.connect(hp); hp.connect(g); g.connect(master);
-    src.start(t); src.stop(t + 0.18);
-    // Crack
-    const oc = ctx.createOscillator(), gc = ctx.createGain();
-    oc.frequency.setValueAtTime(400, t);
-    oc.frequency.exponentialRampToValueAtTime(200, t + 0.035);
-    gc.gain.setValueAtTime(vol * 0.7, t);
-    gc.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
-    oc.connect(gc); gc.connect(master); oc.start(t); oc.stop(t + 0.04);
+    src.start(t); src.stop(t + 0.32);
+
+    // Shell resonance — the wood body of the drum (200 Hz)
+    const shell = ctx.createOscillator(), shellG = ctx.createGain();
+    shell.frequency.setValueAtTime(210, t);
+    shellG.gain.setValueAtTime(vol * 0.55, t);
+    shellG.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+    shell.connect(shellG); shellG.connect(master); shell.start(t); shell.stop(t + 0.19);
+
+    // Crack transient (380→190 Hz) — the rim shot snap
+    const crack = ctx.createOscillator(), crackG = ctx.createGain();
+    crack.frequency.setValueAtTime(380, t);
+    crack.frequency.exponentialRampToValueAtTime(190, t + 0.04);
+    crackG.gain.setValueAtTime(vol * 0.9, t);
+    crackG.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    crack.connect(crackG); crackG.connect(master); crack.start(t); crack.stop(t + 0.05);
+
+    // Room ambience — short noise tail simulating room reflections
+    const rLen = Math.floor(ctx.sampleRate * 0.12);
+    const rBuf = ctx.createBuffer(1, rLen, ctx.sampleRate);
+    const rD = rBuf.getChannelData(0);
+    for (let i = 0; i < rLen; i++) rD[i] = (Math.random() * 2 - 1) * (1 - i / rLen);
+    const rSrc = ctx.createBufferSource(); rSrc.buffer = rBuf;
+    const rHp = ctx.createBiquadFilter(); rHp.type = 'highpass'; rHp.frequency.value = 800;
+    const rG = ctx.createGain();
+    rG.gain.setValueAtTime(vol * 0.25, t + 0.04); // delayed slightly
+    rG.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+    rSrc.connect(rHp); rHp.connect(rG); rG.connect(master);
+    rSrc.start(t + 0.04); rSrc.stop(t + 0.16);
   }
 
-  // ── Closed hi-hat ──
-  function hat(t, vol) {
-    const len = Math.floor(ctx.sampleRate * 0.022);
+  // ── RIDE CYMBAL: metallic shimmer on 8th notes ──
+  function ride(t, vol = 0.14) {
+    const len = Math.floor(ctx.sampleRate * 0.55);
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    for (let i = 0; i < len; i++) {
+      const env = Math.pow(1 - i / len, 0.7);
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
     const src = ctx.createBufferSource(); src.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 7500; bp.Q.value = 0.4;
     const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass'; hp.frequency.value = 10000;
+    hp.type = 'highpass'; hp.frequency.value = 5500;
     const g = ctx.createGain();
     g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
-    src.connect(hp); hp.connect(g); g.connect(master);
-    src.start(t); src.stop(t + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.56);
   }
 
-  // ── Open hi-hat (longer decay) ──
-  function openHat(t, vol = 0.18) {
-    const len = Math.floor(ctx.sampleRate * 0.28);
+  // ── CRASH CYMBAL: long wash, fired every 4 bars ──
+  function crash(t, vol = 0.38) {
+    const len = Math.floor(ctx.sampleRate * 2.2);
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    for (let i = 0; i < len; i++) {
+      const env = Math.pow(1 - i / len, 0.45);
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
     const src = ctx.createBufferSource(); src.buffer = buf;
     const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass'; hp.frequency.value = 8000;
+    hp.type = 'highpass'; hp.frequency.value = 5800;
     const g = ctx.createGain();
     g.gain.setValueAtTime(vol, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 2.2);
     src.connect(hp); hp.connect(g); g.connect(master);
-    src.start(t); src.stop(t + 0.29);
+    src.start(t); src.stop(t + 2.21);
   }
 
   function pad(freqs, t, dur) {
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.042, t + 0.2);
-    g.gain.setValueAtTime(0.042, t + dur * 0.78);
+    g.gain.linearRampToValueAtTime(0.038, t + 0.2);
+    g.gain.setValueAtTime(0.038, t + dur * 0.78);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     g.connect(master);
     freqs.forEach(f => {
@@ -985,39 +1028,36 @@ const Music = (() => {
     o.type = 'sine';
     o.frequency.value = freq / 2;
     lp.type = 'lowpass'; lp.frequency.value = 350;
-    g.gain.setValueAtTime(0.55, t);
+    g.gain.setValueAtTime(0.5, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(lp); lp.connect(g); g.connect(master);
     o.start(t); o.stop(t + dur);
   }
 
-  // ── Tick: full pattern per beat ──
-  // 16th-note grid: offsets within each beat at DUR*0, *0.25, *0.5, *0.75
+  // ── ROCK PATTERN ──────────────────────────────────────────────────────────
+  // Kick on 1 & 3, big backbeat snare on 2 & 4,
+  // ride cymbal on every 8th note, crash cymbal every 4 bars.
   function tick(b, t) {
-    const b4 = b % 4;  // 0‒3 within bar
-    const b8 = b % 8;  // 0‒7 within 2-bar phrase
+    const b4  = b % 4;   // position within 1 bar (0‒3)
+    const b16 = b % 16;  // position within 4-bar phrase (0‒15)
     const chord = CHORDS[Math.floor(b / 4) % CHORDS.length];
 
-    // KICK — 1 and 3; anticipation ghost on last 16th of bar
+    // KICK — 1 and 3; extra "and-of-4" kick for driving momentum
     if (b4 === 0) kick(t);
     if (b4 === 2) kick(t);
-    if (b8 === 3) kick(t + DUR * 0.75, 0.5); // pickup into bar 2
+    if (b4 === 3) kick(t + DUR * 0.5, 0.55); // "and" of 4 — pickup kick
 
-    // SNARE — 2 and 4 (backbeat); ghost note before the 3
+    // SNARE — 2 and 4 (the rock backbeat, loud)
     if (b4 === 1 || b4 === 3) snare(t);
-    if (b4 === 1) snare(t + DUR * 0.75, 0.12); // ghost on "ah" of 2
 
-    // HI-HATS — dense 16th-note grid (4 per beat)
-    // accents: downbeat > off-16th > 8th > off-16th
-    hat(t,             b4 === 0 ? 0.22 : 0.14); // on the beat
-    hat(t + DUR*0.25,  0.07);                    // e
-    hat(t + DUR*0.5,   0.16);                    // and
-    hat(t + DUR*0.75,  0.08);                    // ah
+    // RIDE — 8th notes (on the beat + the "and")
+    ride(t, b4 === 0 ? 0.18 : 0.12);
+    ride(t + DUR * 0.5, 0.10);
 
-    // OPEN HAT — on the "and" of beat 2 for groove swell
-    if (b4 === 1) openHat(t + DUR * 0.5, 0.22);
+    // CRASH — beat 1 of every 4-bar phrase
+    if (b16 === 0) crash(t);
 
-    // PAD — one chord per bar
+    // PAD — chord per bar
     if (b4 === 0) pad(chord, t, DUR * 4 - 0.06);
 
     // BASS — root on 1, 5th on 3
@@ -1041,13 +1081,13 @@ const Music = (() => {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       master = ctx.createGain();
       const comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -10; comp.ratio.value = 5;
-      comp.attack.value = 0.005; comp.release.value = 0.15;
+      comp.threshold.value = -14; comp.ratio.value = 6;
+      comp.attack.value = 0.003; comp.release.value = 0.2;
       master.connect(comp); comp.connect(ctx.destination);
 
       ctx.resume().then(() => {
         master.gain.setValueAtTime(0, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0.36, ctx.currentTime + 2.5);
+        master.gain.linearRampToValueAtTime(0.30, ctx.currentTime + 2.5);
         nextBeat = ctx.currentTime + 0.08;
         beatIdx = 0;
         sched = setInterval(schedule, 40);
