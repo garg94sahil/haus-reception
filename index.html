@@ -30,6 +30,9 @@ html, body {
   justify-content: center;
   overflow: hidden;
   font-family: 'Oswald', sans-serif;
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .stage {
@@ -1059,7 +1062,16 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); Music.start(); run(); }
   else Music.start();
 });
-document.getElementById('stage').addEventListener('click', () => { Music.start(); run(); });
+document.getElementById('stage').addEventListener('click', () => {
+  Music.start();
+  run();
+  // Request fullscreen on first interaction (TV-friendly)
+  const el = document.documentElement;
+  if (!document.fullscreenElement) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen)
+      ?.call(el);
+  }
+});
 </script>
 </body>
 </html>
