@@ -1,0 +1,11 @@
+node_modules/
+temporary screenshots/
+screenshot.mjs
+screenshot-frames.mjs
+serve.mjs
+package.json
+package-lock.json
+production-doc.md
+CLAUDE.md
+CLAUDE (3).md
+.claude/
