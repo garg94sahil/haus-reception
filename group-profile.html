@@ -31,6 +31,13 @@
   .cover-foot .chip{padding:10px 18px;border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;gap:10px}
   .cover-foot .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--mitti)}
   .cover-pageno{display:none}
+  /* Snap animated elements to initial state before re-playing animations */
+  .slide.entering .reveal,.slide.entering .rise,.slide.entering .fade,
+  .slide.entering .fade-fast,.slide.entering .grow,.slide.entering .grow-y,
+  .slide.entering .clip-up,.slide.entering .clip-r,.slide.entering .zoom-in,
+  .slide.entering .slide-r,.slide.entering .letters > span > b,.slide.entering .draw{
+    transition:none!important;animation:none!important;
+  }
 
   /* ---------- Glance ---------- */
   .s-glance{background:var(--paper)}
@@ -849,23 +856,31 @@
 <script>
 (function(){
   const stage = document.querySelector('deck-stage');
-  if(!stage) return;
-  window.addEventListener('message', (e)=>{
-    if(e.data && typeof e.data.slideIndexChanged === 'number'){
-      const slides = stage.querySelectorAll(':scope > section.slide');
-      slides.forEach((s,i)=>{
-        if(i === e.data.slideIndexChanged){
-          s.removeAttribute('data-active');
-          requestAnimationFrame(()=>requestAnimationFrame(()=>s.setAttribute('data-active','')));
-        } else {
-          s.removeAttribute('data-active');
-        }
-      });
-    }
+  if (!stage) return;
+
+  function activate(slide) {
+    // Snap all animated children to their initial (hidden) state with no transition,
+    // then re-enable transitions and add data-active so animations play from frame 0.
+    slide.removeAttribute('data-active');
+    slide.classList.add('entering');
+    void slide.offsetHeight;         // flush: transitions suppressed, elements at t=0 state
+    slide.classList.remove('entering');
+    void slide.offsetHeight;         // flush: transitions re-enabled, still at t=0 state
+    slide.setAttribute('data-active',''); // fire all animations
+  }
+
+  // slidechange fires synchronously during data-deck-active switch — no async delay.
+  stage.addEventListener('slidechange', (e)=>{
+    const slides = stage.querySelectorAll(':scope > section.slide');
+    slides.forEach((s, i) => {
+      if (i !== e.detail.index) s.removeAttribute('data-active');
+    });
+    if (e.detail.reason !== 'init') activate(slides[e.detail.index]);
   });
+
   requestAnimationFrame(()=>{
     const first = stage.querySelector(':scope > section.slide');
-    if(first) first.setAttribute('data-active','');
+    if (first) activate(first);
   });
 })();
 </script>
