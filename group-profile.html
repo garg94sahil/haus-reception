@@ -30,7 +30,10 @@
   .cover-foot{position:absolute;left:80px;bottom:80px;display:flex;gap:14px;align-items:center;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(14,14,16,.55);font-weight:500;flex-wrap:wrap}
   .cover-foot .chip{padding:10px 18px;border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;gap:10px}
   .cover-foot .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--mitti)}
-  .cover-pageno{position:absolute;right:80px;bottom:80px;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(14,14,16,.45);font-weight:500}
+  .cover-pageno{display:none}
+  /* Page-transition wipe */
+  #pg-wipe{position:fixed;inset:0;background:#82B4FF;opacity:0;pointer-events:none;z-index:99990;transition:opacity .5s ease}
+  #pg-wipe.in{opacity:1}
 
   /* ---------- Glance ---------- */
   .s-glance{background:var(--paper)}
@@ -176,10 +179,10 @@
 
   /* ---------- Managed Offices ---------- */
   .s-mo{background:var(--paper)}
-  .mo-head{position:absolute;left:80px;top:160px;right:80px}
+  .mo-head{position:absolute;left:80px;top:130px;right:80px}
   .mo-head .eye{font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--mitti);font-weight:600;margin-bottom:24px;display:flex;align-items:center;gap:14px}
   .mo-head .eye .pill{padding:6px 14px;border:1px solid var(--mitti);color:var(--mitti);border-radius:999px;font-size:11px;letter-spacing:.22em}
-  .mo-head h1{font-family:'Oswald';font-weight:400;font-size:130px;line-height:.9;color:var(--ink);letter-spacing:-.01em}
+  .mo-head h1{font-family:'Oswald';font-weight:400;font-size:90px;line-height:.9;color:var(--ink);letter-spacing:-.01em}
   .mo-head h1 em{font-family:'Fraunces';font-style:italic;font-weight:300;color:var(--mitti);text-transform:none}
   .mo-head .sub{font-family:'Fraunces';font-style:italic;font-size:24px;color:rgba(14,14,16,.65);margin-top:24px;max-width:1100px;line-height:1.32}
   .mo-pipeline{position:absolute;left:80px;right:80px;bottom:140px;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
@@ -190,8 +193,9 @@
   .mo-pipeline .row .area{font-family:'Inter';font-size:17px;color:var(--ink);font-weight:500}
   .mo-pipeline .row .area small{display:block;font-weight:400;color:rgba(14,14,16,.55);font-size:13px;margin-top:2px}
   .mo-pipeline .row .partner{font-family:'Inter';font-size:14px;color:var(--ink-2)}
-  .mo-pipeline .row .stage{font-family:'Inter';font-size:11px;color:var(--mitti);font-weight:600;text-transform:uppercase;letter-spacing:.2em;text-align:right}
+  .mo-pipeline .row .stage{font-family:'Inter';font-size:11px;color:var(--mitti);font-weight:600;text-transform:uppercase;letter-spacing:.2em;text-align:center}
   .mo-pipeline .row .stage.live{color:#1F8A5B}
+  .mo-pipeline .row .stage.inprog{color:#B35C00}
 
   /* ---------- Zoom ---------- */
   .s-zoom{background:var(--paper-2);overflow:hidden}
@@ -286,13 +290,6 @@
 <section class="slide s-cover" data-screen-label="01 Cover">
   <div class="gridlines fade" style="--d:200ms"></div>
 
-  <div class="cover-meta reveal" style="--d:400ms">
-    <div><strong>Group Profile</strong></div>
-    <div>
-</div>
-    <div>2026 · CONFIDENTIAL</div>
-  </div>
-
   <div class="cover-stack">
     <div class="cover-eyebrow">
       <span class="bar grow" style="--d:600ms"></span>
@@ -326,7 +323,6 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">02 — At a Glance</div>
   </div>
@@ -374,13 +370,12 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">03 — Platforms</div>
   </div>
   <div class="footbar">
-    <div class="reveal" style="--d:600ms">Five operating platforms, one family</div>
-    <div class="reveal" style="--d:600ms">Page 03 / 10</div>
+    <div class="reveal" style="--d:600ms"></div>
+    <div class="reveal" style="--d:600ms"></div>
   </div>
 
   <div class="pl-head">
@@ -427,7 +422,7 @@
     </div>
     <div class="pl">
       <div class="badge reveal" style="--d:1400ms"><span class="dot"></span> 04 Workspaces</div>
-      <h3 class="reveal" style="--d:1550ms">Managed<br><em>Offices</em></h3>
+      <h3 class="reveal" style="--d:1550ms">Haus+<br><em>Offices</em></h3>
       <div class="since reveal" style="--d:1700ms">~500K sq ft pipeline</div>
       <p class="desc reveal" style="--d:1850ms">Premium, fully serviced, technology-enabled workspaces — for startups, SMEs, GCCs, and enterprise clients across major metros.</p>
       <div class="tags">
@@ -444,7 +439,6 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">04 — Saga Hotels</div>
   </div>
@@ -508,7 +502,6 @@
   <div class="topbar dark">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-white.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">05 — Endurance Capital</div>
   </div>
@@ -527,7 +520,7 @@
         <em class="reveal" style="--d:800ms">Value endures.</em>
       </h2>
       <p class="lede reveal" style="--d:1100ms">The group's <strong>public markets</strong> investment platform — a SEBI-registered Portfolio Management Services (PMS) firm investing in <strong>listed Indian equities</strong>, with approximately ₹200 Cr of assets under management.</p>
-      <p class="body reveal" style="--d:1400ms">Endurance Capital invests across Indian <strong>public stock markets</strong> with a long-term, research-driven approach focused on quality listed businesses, capital preservation, and compounding returns. We back enduring publicly-traded companies the old-fashioned way — patient capital, deep research, low turnover.</p>
+      <p class="body reveal" style="--d:1400ms">Endurance Capital invests across Indian <strong>public stock markets</strong> with a long-term, research-driven approach focused on quality listed businesses, capital preservation, and compounding returns. We back enduring publicly-traded companies the old-fashioned way — patient capital, deep research.</p>
       <div class="quote reveal" style="--d:1700ms">"Listed equities. Quality businesses. Capital preservation. Compounding returns."</div>
     </div>
     <div class="end-right">
@@ -540,7 +533,7 @@
           <div class="aum-label">— Assets Under Management · Listed Public Equities</div>
           <div class="aum"></div>
           <h3>Public-market<br><em>investing.</em></h3>
-          <p class="thesis">Long-term ownership of high-quality companies listed on Indian stock exchanges. Concentrated portfolio. Research-driven. Low turnover. Built to compound through cycles.</p>
+          <p class="thesis">Long-term ownership of high-quality companies listed on Indian stock exchanges. Concentrated portfolio. Research-driven. Built to compound through cycles.</p>
           <div class="focus">
             <div class="row"><div class="n">01</div><div class="v">Vehicle<small>SEBI Portfolio Management Services (PMS)</small></div></div>
             <div class="row"><div class="n">02</div><div class="v">Universe<small>Listed Indian equities · NSE / BSE</small></div></div>
@@ -562,7 +555,6 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">06 — Genesis Finance</div>
   </div>
@@ -602,7 +594,6 @@
       </div>
     </div>
     <div class="gen-right">
-      <img src="assets/haus-symbol-white.png" class="gen-symbol fade" style="--d:400ms" alt="">
       <div class="pull">
         <div class="badge reveal" style="--d:500ms">— Operating Company</div>
         <div class="logo-tile zoom-in" style="--d:700ms">
@@ -620,7 +611,7 @@
         <div class="row reveal" style="--d:1950ms"><div class="n">002</div><div class="name">Prudent Underwriting</div><div class="arrow">→</div></div>
         <div class="row reveal" style="--d:2050ms"><div class="n">003</div><div class="name">Responsible Growth</div><div class="arrow">→</div></div>
         <div class="row reveal" style="--d:2150ms"><div class="n">004</div><div class="name">Diversified Loan Book</div><div class="arrow">→</div></div>
-        <div class="row reveal" style="--d:2250ms"><div class="n">005</div><div class="name">genesisfinance.net</div><div class="arrow">→</div></div>
+        <div class="row reveal" style="--d:2250ms"><div class="n">005</div><div class="name">Built for the Long Term</div><div class="arrow">→</div></div>
       </div>
     </div>
   </div>
@@ -632,18 +623,17 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">07 — Managed Offices</div>
   </div>
   <div class="footbar">
     <div class="reveal" style="--d:600ms">Premium serviced workspaces · Pan-India pipeline</div>
-    <div class="reveal" style="--d:600ms">Page 07 / 10</div>
+    <div class="reveal" style="--d:600ms"></div>
   </div>
 
   <div class="mo-head">
-    <div class="end-logo-row reveal" style="--d:200ms">
-      <div class="logo-tile-light"><img src="assets/haus-logo-mitti.png" alt="Haus+"></div>
+    <div class="end-logo-row reveal" style="--d:100ms;margin-bottom:16px">
+      <div class="logo-tile-light"><img src="assets/haus-logo-white.png" alt="Haus+"></div>
       <div class="logo-meta dark"><span>Haus+ Managed Offices</span><small>Premium Serviced Workspaces · Pan-India</small></div>
     </div>
     <div class="eye reveal" style="--d:300ms">
@@ -654,7 +644,6 @@
       <span class="reveal" style="--d:500ms">Half a million</span> <em class="reveal" style="--d:800ms">square feet</em>
       <span class="reveal" style="--d:1100ms"> in flight.</span>
     </h1>
-    <p class="sub reveal" style="--d:1400ms">Premium, fully serviced, technology-enabled workspaces — for startups, SMEs, GCCs and enterprise clients. Built with an institutional operating model combining real estate, technology, hospitality, and workplace services.</p>
   </div>
 
   <div class="mo-pipeline">
@@ -686,7 +675,7 @@
       <div class="area">Leased area<small>
 </small></div>
       <div class="partner">Anchor in Builder tower</div>
-      <div class="stage live"></div>
+      <div class="stage">Pipeline</div>
     </div>
     <div class="row reveal" style="--d:2200ms">
       <div class="n">005</div>
@@ -702,6 +691,13 @@
       <div class="partner"></div>
       <div class="stage">Planned</div>
     </div>
+    <div class="row reveal" style="--d:2400ms">
+      <div class="n">007</div>
+      <div class="city">Delhi<small style="display:block;font-family:Inter;font-size:11px;color:rgba(14,14,16,.5);margin-top:4px;letter-spacing:.18em">South Delhi · Saket</small></div>
+      <div class="area">~15,000 sq. ft.<small>Ras Villas</small></div>
+      <div class="partner">Boutique workspace · South Delhi</div>
+      <div class="stage inprog">In Progress</div>
+    </div>
   </div>
 </section>
 
@@ -711,13 +707,12 @@
   <div class="topbar">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-mitti.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
     <div class="reveal" style="--d:400ms">08 — Group Structure</div>
   </div>
   <div class="footbar">
     <div class="reveal" style="--d:600ms">Family-owned · Professionally run</div>
-    <div class="reveal" style="--d:600ms">Page 08 / 10</div>
+    <div class="reveal" style="--d:600ms"></div>
   </div>
 
   <div class="org-head">
@@ -743,50 +738,49 @@
       <div class="since">est. 1989</div>
     </div>
 
-    <div class="org-node rise" style="--d:1500ms;left:0;top:280px;width:calc(25% - 18px)">
+    <div class="org-node rise" style="--d:1500ms;left:0;top:280px;width:calc(25% - 18px);height:180px">
       <div class="k">— Op. Co. 01</div>
       <div class="name">Saga Hotels</div>
       <div class="desc">Hospitality · Hyatt &amp; Marriott partners</div>
       <div class="since">3 destinations</div>
     </div>
-    <div class="org-node rise" style="--d:1650ms;left:calc(25% + 8px);top:280px;width:calc(25% - 18px)">
+    <div class="org-node rise" style="--d:1650ms;left:calc(25% + 8px);top:280px;width:calc(25% - 18px);height:180px">
       <div class="k">— Op. Co. 02</div>
       <div class="name">Endurance Capital</div>
-      <div class="desc"></div>
+      <div class="desc">SEBI PMS · Listed equities</div>
       <div class="since">SEBI registered</div>
     </div>
-    <div class="org-node rise" style="--d:1800ms;left:calc(50% + 16px);top:280px;width:calc(25% - 18px)">
+    <div class="org-node rise" style="--d:1800ms;left:calc(50% + 16px);top:280px;width:calc(25% - 18px);height:180px">
       <div class="k">— Op. Co. 03</div>
       <div class="name">Genesis Finance</div>
       <div class="desc">RBI NBFC · ~₹250 Cr AUM</div>
       <div class="since">est. 1989</div>
     </div>
-    <div class="org-node rise" style="--d:1950ms;right:0;top:280px;width:calc(25% - 18px)">
+    <div class="org-node rise" style="--d:1950ms;right:0;top:280px;width:calc(25% - 18px);height:180px">
       <div class="k">— Op. Co. 04</div>
-      <div class="name">Managed Offices</div>
-      <div class="desc">~500K sq ft pipeline · Prestige tie-ups</div>
+      <div class="name">Haus+</div>
+      <div class="desc">~500K sq ft pipeline · Workspaces</div>
       <div class="since">In build-out</div>
     </div>
   </div>
 </section>
 
 <!-- ============== 10 WHY ============== -->
-<section class="slide s-why" data-screen-label="09 Why">
+<section class="slide s-why" data-screen-label="09 Why Us">
   <div class="frame dark fade" style="--d:200ms"></div>
   <div class="topbar dark">
     <div class="left reveal" style="--d:300ms">
       <img src="assets/haus-symbol-white.png" class="symbol" alt="">
-      <span class="sep"></span><span>Group Profile</span>
     </div>
-    <div class="reveal" style="--d:400ms">09 — Why This Counterparty</div>
+    <div class="reveal" style="--d:400ms">09 — Why Us?</div>
   </div>
   <div class="footbar dark">
     <div class="reveal" style="--d:600ms"></div>
-    <div class="reveal" style="--d:600ms">Page 09 / 10</div>
+    <div class="reveal" style="--d:600ms"></div>
   </div>
 
   <div class="why-head">
-    <div class="eye reveal" style="--d:300ms">— Why this group is a confident counterparty</div>
+    <div class="eye reveal" style="--d:300ms">— Why Us?</div>
     <h1>
       <span class="reveal" style="--d:500ms">Long view.</span><br>
       <em class="reveal" style="--d:800ms">Clean record.</em><br>
@@ -826,11 +820,11 @@
   </div>
   <div class="footbar">
     <div class="reveal" style="--d:600ms">Thank you for your time</div>
-    <div class="reveal" style="--d:600ms">May 2026 · Confidential</div>
+    <div class="reveal" style="--d:600ms"></div>
   </div>
 
   <div class="contact-stack">
-    <div class="contact-eye reveal" style="--d:400ms">— We would be honoured to take this forward</div>
+    <div class="contact-eye reveal" style="--d:400ms">— Let's connect.</div>
     <h1 class="contact-title">
       <span class="reveal" style="--d:600ms">Let's build</span><br>
       <em class="reveal" style="--d:1000ms">something that lasts.</em>
@@ -859,22 +853,76 @@
 (function(){
   const stage = document.querySelector('deck-stage');
   if(!stage) return;
+
+  /* Transition wipe overlay */
+  const wipe = document.createElement('div');
+  wipe.id = 'pg-wipe';
+  document.body.appendChild(wipe);
+
+  let isFirst = true;
+
+  stage.addEventListener('slidechange', (e)=>{
+    if(isFirst){ isFirst=false; return; } // skip initial mount
+    wipe.classList.add('in');
+  });
+
   window.addEventListener('message', (e)=>{
     if(e.data && typeof e.data.slideIndexChanged === 'number'){
       const slides = stage.querySelectorAll(':scope > section.slide');
       slides.forEach((s,i)=>{
         if(i === e.data.slideIndexChanged){
           s.removeAttribute('data-active');
-          requestAnimationFrame(()=>requestAnimationFrame(()=>s.setAttribute('data-active','')));
+          setTimeout(()=>{
+            wipe.classList.remove('in');
+            requestAnimationFrame(()=>requestAnimationFrame(()=>s.setAttribute('data-active','')));
+          }, 540);
         } else {
           s.removeAttribute('data-active');
         }
       });
     }
   });
+
   requestAnimationFrame(()=>{
     const first = stage.querySelector(':scope > section.slide');
     if(first) first.setAttribute('data-active','');
+  });
+})();
+</script>
+
+<script>
+/* Auto-advance loop — each slide duration in milliseconds */
+(function(){
+  const DURATIONS = [
+    12000, // 01 Cover
+    12000, // 02 Glance
+    14000, // 03 Platforms
+    12000, // 04 Saga
+    12000, // 05 Endurance
+    12000, // 06 Genesis
+    14000, // 07 Managed Offices
+    12000, // 08 Structure
+    12000, // 09 Why
+    10000, // 10 Contact
+  ];
+
+  function schedule(stage, idx) {
+    const dur = DURATIONS[idx] !== undefined ? DURATIONS[idx] : 10000;
+    setTimeout(function() {
+      const next = (idx + 1) % stage.length;
+      stage.goTo(next);
+      schedule(stage, next);
+    }, dur);
+  }
+
+  customElements.whenDefined('deck-stage').then(function() {
+    const stage = document.querySelector('deck-stage');
+    if (!stage) return;
+    // Hide the navigation overlay (presenting mode)
+    window.postMessage({ __omelette_presenting: true }, '*');
+    setTimeout(function() {
+      schedule(stage, stage.index);
+    }, 800);
   });
 })();
 </script>
