@@ -2,6 +2,9 @@ node_modules/
 temporary screenshots/
 screenshot.mjs
 screenshot-frames.mjs
+screenshot-profile.mjs
+screenshot-profile2.mjs
+screenshot-animated.mjs
 serve.mjs
 package.json
 package-lock.json
@@ -9,3 +12,13 @@ production-doc.md
 CLAUDE.md
 CLAUDE (3).md
 .claude/
+make-pptx.mjs
+record.mjs
+fetch-design.mjs
+fetch-design2.mjs
+fetch-design3.mjs
+design-raw-base.txt
+design-handoff.tar.gz
+design-handoff/
+Brand_assets/
+Haus+ Reception Loop.pptx
