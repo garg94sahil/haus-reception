@@ -31,9 +31,6 @@
   .cover-foot .chip{padding:10px 18px;border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;gap:10px}
   .cover-foot .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--mitti)}
   .cover-pageno{display:none}
-  /* Page-transition wipe */
-  #pg-wipe{position:fixed;inset:0;background:#82B4FF;opacity:0;pointer-events:none;z-index:99990;transition:opacity .5s ease}
-  #pg-wipe.in{opacity:1}
 
   /* ---------- Glance ---------- */
   .s-glance{background:var(--paper)}
@@ -853,36 +850,19 @@
 (function(){
   const stage = document.querySelector('deck-stage');
   if(!stage) return;
-
-  /* Transition wipe overlay */
-  const wipe = document.createElement('div');
-  wipe.id = 'pg-wipe';
-  document.body.appendChild(wipe);
-
-  let isFirst = true;
-
-  stage.addEventListener('slidechange', (e)=>{
-    if(isFirst){ isFirst=false; return; } // skip initial mount
-    wipe.classList.add('in');
-  });
-
   window.addEventListener('message', (e)=>{
     if(e.data && typeof e.data.slideIndexChanged === 'number'){
       const slides = stage.querySelectorAll(':scope > section.slide');
       slides.forEach((s,i)=>{
         if(i === e.data.slideIndexChanged){
           s.removeAttribute('data-active');
-          setTimeout(()=>{
-            wipe.classList.remove('in');
-            requestAnimationFrame(()=>requestAnimationFrame(()=>s.setAttribute('data-active','')));
-          }, 540);
+          requestAnimationFrame(()=>requestAnimationFrame(()=>s.setAttribute('data-active','')));
         } else {
           s.removeAttribute('data-active');
         }
       });
     }
   });
-
   requestAnimationFrame(()=>{
     const first = stage.querySelector(':scope > section.slide');
     if(first) first.setAttribute('data-active','');
