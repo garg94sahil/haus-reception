@@ -256,6 +256,22 @@
   .why-grid .cell h3{font-family:'Oswald';font-weight:500;font-size:30px;color:#fff;line-height:1;margin-top:24px;text-transform:uppercase;letter-spacing:.02em}
   .why-grid .cell .desc{font-family:'Inter';font-size:15px;color:rgba(255,255,255,.72);margin-top:16px;line-height:1.5;max-width:340px}
 
+  /* ---------- Video Overlay ---------- */
+  #video-overlay {
+    display: none;
+    opacity: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+  }
+  #video-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
   /* ---------- Contact ---------- */
   .s-contact{background:#fff}
   .contact-mark{position:absolute;left:80px;top:80px;display:flex;align-items:center;gap:18px}
@@ -618,9 +634,9 @@
           <img src="assets/genesis-logo.png" alt="Genesis Finance">
         </div>
         <h3>
-          <span class="reveal" style="--d:1000ms">Built on</span><br>
-          <em class="reveal" style="--d:1200ms">relationships</em><br>
-          <span class="reveal" style="--d:1400ms">that compound.</span>
+          <span class="reveal" style="--d:1000ms">Naya Bharat</span><br>
+          <em class="reveal" style="--d:1200ms">ki Finance</em><br>
+          <span class="reveal" style="--d:1400ms">Company.</span>
         </h3>
       </div>
       <div class="product-list">
@@ -923,8 +939,15 @@
 })();
 </script>
 
+<!-- ════ VIDEO OVERLAY — alternates with slide deck ════ -->
+<div id="video-overlay">
+  <iframe id="video-frame" src="" allow="autoplay; fullscreen"></iframe>
+</div>
+
 <script>
-/* Auto-advance loop — each slide duration in milliseconds */
+/* Auto-advance loop — each slide duration in milliseconds.
+   After one full cycle, fades in the reception video for VIDEO_MS,
+   then fades back to the slide deck from slide 1, and repeats. */
 (function(){
   const DURATIONS = [
     12000, // 01 Cover
@@ -939,22 +962,72 @@
     10000, // 10 Contact
   ];
 
-  function schedule(stage, idx) {
+  const SLIDE_CYCLE_MS = DURATIONS.reduce((a, b) => a + b, 0); // 122 000 ms
+  const VIDEO_URL      = 'https://garg94sahil.github.io/Southcourtreception/';
+  const VIDEO_MS       = 75000;   // reception video length
+  const FADE_MS        = 1200;    // crossfade duration
+
+  let slideHandle = null;
+  let modeHandle  = null;
+  let videoActive = false;
+
+  // ── Slide scheduling ──────────────────────────────────
+  function scheduleNext(stage, idx) {
+    if (videoActive) return;
     const dur = DURATIONS[idx] !== undefined ? DURATIONS[idx] : 10000;
-    setTimeout(function() {
+    slideHandle = setTimeout(function() {
+      if (videoActive) return;
       const next = (idx + 1) % stage.length;
       stage.goTo(next);
-      schedule(stage, next);
+      scheduleNext(stage, next);
     }, dur);
   }
 
+  // ── Show video ────────────────────────────────────────
+  function showVideo() {
+    videoActive = true;
+    if (slideHandle) { clearTimeout(slideHandle); slideHandle = null; }
+
+    const overlay = document.getElementById('video-overlay');
+    const frame   = document.getElementById('video-frame');
+    frame.src = VIDEO_URL;
+    overlay.style.display = 'block';
+    // Trigger reflow so transition fires
+    void overlay.offsetHeight;
+    overlay.style.transition = 'opacity ' + (FADE_MS / 1000) + 's ease';
+    overlay.style.opacity = '1';
+
+    modeHandle = setTimeout(hideVideo, VIDEO_MS);
+  }
+
+  // ── Hide video, return to slides ──────────────────────
+  function hideVideo() {
+    const overlay = document.getElementById('video-overlay');
+    overlay.style.transition = 'opacity ' + (FADE_MS / 1000) + 's ease';
+    overlay.style.opacity = '0';
+
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      document.getElementById('video-frame').src = '';
+      videoActive = false;
+
+      const stage = document.querySelector('deck-stage');
+      if (stage) {
+        stage.goTo(0);
+        scheduleNext(stage, 0);
+      }
+      modeHandle = setTimeout(showVideo, SLIDE_CYCLE_MS);
+    }, FADE_MS);
+  }
+
+  // ── Boot ──────────────────────────────────────────────
   customElements.whenDefined('deck-stage').then(function() {
     const stage = document.querySelector('deck-stage');
     if (!stage) return;
-    // Hide the navigation overlay (presenting mode)
     window.postMessage({ __omelette_presenting: true }, '*');
     setTimeout(function() {
-      schedule(stage, stage.index);
+      scheduleNext(stage, stage.index);
+      modeHandle = setTimeout(showVideo, SLIDE_CYCLE_MS);
     }, 800);
   });
 })();
