@@ -1032,5 +1032,33 @@
   });
 })();
 </script>
+
+<audio id="bg-music" loop preload="auto">
+  <source src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg" type="audio/ogg">
+</audio>
+<script>
+(function () {
+  var audio = document.getElementById('bg-music');
+  audio.volume = 0.22;
+
+  function tryPlay() {
+    audio.play().catch(function () {});
+  }
+
+  // Script is at bottom of body — DOM already ready, call directly
+  tryPlay();
+
+  // Fallback: first user gesture unlocks autoplay if browser blocked it
+  var onGesture = function () {
+    tryPlay();
+    document.removeEventListener('click',      onGesture);
+    document.removeEventListener('keydown',    onGesture);
+    document.removeEventListener('touchstart', onGesture);
+  };
+  document.addEventListener('click',      onGesture);
+  document.addEventListener('keydown',    onGesture);
+  document.addEventListener('touchstart', onGesture);
+})();
+</script>
 </body>
 </html>
