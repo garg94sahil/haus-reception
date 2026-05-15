@@ -1033,35 +1033,19 @@
 })();
 </script>
 
-<audio id="bg-music" loop preload="auto" autoplay>
-  <source src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg" type="audio/ogg">
+<audio id="bg-music" autoplay loop preload="auto">
+  <source src="assets/fur-elise.ogg" type="audio/ogg">
 </audio>
 <script>
-(function () {
-  var audio = document.getElementById('bg-music');
-  audio.volume = 0.22;
-
-  function tryPlay() {
-    if (!audio.paused) return;
-    audio.play().catch(function () {});
-  }
-
-  // Try immediately (script is at bottom of body — DOM already ready)
-  tryPlay();
-
-  // Keep retrying every 1.5 s — covers kiosk/TV autoplay policy delay
-  setInterval(tryPlay, 1500);
-
-  // Any user interaction also unlocks it
-  ['click','keydown','keyup','mousedown','pointerdown','touchstart'].forEach(function(ev) {
-    document.addEventListener(ev, tryPlay);
-  });
-
-  // Try when window gets focus or tab becomes visible (e.g. TV screen wake)
-  window.addEventListener('focus', tryPlay);
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') tryPlay();
-  });
+(function(){
+  var a = document.getElementById('bg-music');
+  a.volume = 0.25;
+  function play(){ a.play().catch(function(){}); }
+  play();
+  setInterval(function(){ if(a.paused) play(); }, 2000);
+  document.addEventListener('click', play);
+  document.addEventListener('keydown', play);
+  document.addEventListener('touchstart', play);
 })();
 </script>
 </body>
